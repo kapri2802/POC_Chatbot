@@ -1,0 +1,46 @@
+{
+  "name": "crawcochatbot",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "aws-amplify": "^3.3.1",
+    "aws-amplify-react": "^4.2.5",
+    "fs": "0.0.1-security",
+    "json-xml": "^1.0.9",
+    "react": "^16.13.1",
+    "react-chat-ui": "^0.4.0",
+    "react-dom": "^16.13.1",
+    "react-native-xml2js": "^1.0.3",
+    "react-scripts": "3.4.3",
+    "react-transition-group": "^4.4.1",
+    "react-xml-parser": "^1.1.8",
+    "txml": "^4.0.0",
+    "uuid": "^8.3.2",
+    "xml-js": "^1.6.11",
+    "xmldom": "^0.4.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

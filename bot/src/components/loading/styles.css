@@ -1,0 +1,84 @@
+.loading {
+    /* color: black; */
+    padding: 11px;
+    border-radius: 20px;
+    font-size: 14px;
+    line-height: 20px;
+    padding-left:10px ;
+    padding-right:10px ;
+    margin-bottom: 15px;
+    align-self: flex-start;
+    background-color:  rgb(117, 140, 161);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    width: 40px;
+}
+
+
+.loading__dot {
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    color: white;
+    background-color: white;
+    margin-right: 10px;
+    position: absolute;
+}
+
+.loading__dot--1 {
+    top: 8px;
+    left: 11px;
+}
+
+.loading__dot--2 {
+    top: 8px;
+    left: 28px;
+}
+
+.loading__dot--3 {
+    top: 8px;
+    left: 45px;
+}
+
+
+/* Dots animation */
+
+@keyframes blink {
+
+    0% {
+      opacity: .2;
+    }
+
+    20% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: .2;
+    }
+}
+
+.loading span {
+
+    animation-name: blink;
+
+    animation-duration: 0.7s;
+
+    animation-iteration-count: infinite;
+
+    animation-fill-mode: both;
+}
+
+.loading span:nth-child(2) {
+
+    animation-delay: .3s;
+}
+
+.loading span:nth-child(3) {
+
+    animation-delay: .5s;
+}

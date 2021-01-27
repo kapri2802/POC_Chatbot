@@ -1,0 +1,17 @@
+.link-container {
+  outline: none;
+  background-color: rgb(75, 182, 72);
+  font-size: 14px;
+  line-height: 25px;
+  border: 3px solid rgb(0, 132, 255);
+  border-radius: 25px;
+  margin-bottom: 15px;
+  padding: 5px;
+  background-color:  rgb(0, 132, 255);
+}
+
+.link-container__link {
+  /* color: white; */
+    font-size: 14px;
+    text-decoration: underline;
+}

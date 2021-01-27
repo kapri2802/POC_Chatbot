@@ -1,0 +1,20 @@
+
+POST request at Url: http://localhost:3003/api/NewFlightBooking/
+
+
+
+Headers: 
+Accept: text/xml
+Content-Type: text/xml
+
+
+
+OPTIONAL: (if not given API will give all entry data)
+
+Filter criteria format example (Body content as search fields):
+
+<search>
+    <arrival_city>Delhi</arrival_city>
+    <departure>KOLKATA</departure>
+    <cabin_class>ECONOMY</cabin_class>
+</search>

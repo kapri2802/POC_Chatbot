@@ -1,0 +1,10 @@
+.bubble {
+    /* color: black; */
+    padding: 5px;
+    border-radius: 20px;
+    font-size: 14px;
+    line-height: 20px;
+    padding-left:10px ;
+    padding-right:10px ;
+    margin-bottom: 15px;
+}
