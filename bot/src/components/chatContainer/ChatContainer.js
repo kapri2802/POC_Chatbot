@@ -129,14 +129,24 @@ class ChatContainer extends Component {
       messageBubble.sender = "server";
 
       messages = [...this.state.messages, messageBubble];
-
-      this.setState(
-        {
-          messages
-        },
-        () => this.scrolToRef()
-      );
+      
+      setTimeout(() => {
+        this.setState(
+          {
+            messages
+          },
+          () => this.scrolToRef()
+        );
+      },1000)
     }
+
+//       this.setState(
+//         {
+//           messages
+//         },
+//         () => this.scrolToRef()
+//       );
+//     }
 
 
 
