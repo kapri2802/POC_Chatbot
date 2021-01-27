@@ -7,7 +7,7 @@ require('body-parser-xml')(bodyParser);
 
 
 const app = express()
-const port = 3003
+const port = process.env.PORT || 3003;
 
 
 const newFlightBookingRoutes = require('./routes/NewFlightBooking');
