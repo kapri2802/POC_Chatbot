@@ -255,7 +255,7 @@ class ChatContainer extends Component {
     let finalMessage = null;
     finalMessage = await BotService(
       query,
-      "http://54.160.101.191:3003/api/UpdateFlightBooking"
+      "http://54.160.101.191:3003/api/NewFlightBooking"
     );
 
     let jsonArray = [];
