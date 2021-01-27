@@ -245,7 +245,7 @@ class ChatContainer extends Component {
     let finalMessage = null;
     finalMessage = await BotService(
       query,
-      "http://localhost:3003/api/NewFlightBooking/"
+      "http://54.160.101.191:3003/api/UpdateFlightBooking"
     );
 
     let jsonArray = [];
@@ -298,7 +298,7 @@ class ChatContainer extends Component {
     let finalMessage = null;
     finalMessage = await BotService(
       query,
-      "http://localhost:3003/api/UpdateFlightBooking/"
+      "http://54.160.101.191:3003/api/UpdateFlightBooking"
     );
 
     let jsonArray = [];
