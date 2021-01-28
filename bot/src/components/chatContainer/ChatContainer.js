@@ -56,7 +56,7 @@ class ChatContainer extends Component {
             display: "New Booking",
             value: "newflight",
             type: "button",
-            clickedMsg: "I will help you with new booking. Please enter few details",
+            clickedMsg: "I will help you with new booking. I will ask you few questions to gather your travel planned details.",
             handler: this.submitMessage.bind(this),
           },
           {
@@ -64,11 +64,7 @@ class ChatContainer extends Component {
             display: "Update Booking",
             value: "updateflight",
             type: "button",
-            //setTimeout: setTimeout(5000),
-            //handler: this.setState({loading:true}, () => this.scrolToRef()),
-            //clicked: this.setState({loading:true}, () => this.scrolToRef()),
-            //messages : this.setState({loading:true}, () => this.scrolToRef()),
-            clickedMsg: "I will help you modify your bookings. Please enter few details",
+            clickedMsg: "I will help you with update booking. I will ask you few questions to gather your existing booking details.",
             
             handler: this.submitMessage.bind(this),
           },
@@ -77,7 +73,7 @@ class ChatContainer extends Component {
             display: "Cancellation",
             value: "cancelflight",
             type: "button",
-            clickedMsg: "I will help you to cancel bookings. Please enter few details",
+            clickedMsg: "I will help you with cancel booking. I will ask you few questions to gather your existing booking details.",
             handler: this.submitMessage.bind(this),
           },
         ],
@@ -235,7 +231,7 @@ class ChatContainer extends Component {
           message.id = currentId++;
           message.type = "text";
           message.sender = "server";
-          message.display = " Your booking has been cancelled";
+          message.display = " Your booking/service has been cancelled.";
       
           messages.push(message);
 
@@ -341,7 +337,7 @@ class ChatContainer extends Component {
     msgdetails.id = currentId++;
     msgdetails.type = "text";
     msgdetails.sender = "server";
-    msgdetails.display = " Your Modified ticket details are as follows:";
+    msgdetails.display = " Your modified ticket details are as follows:";
 
     messages.push(msgdetails);
     setTimeout(() => {
@@ -351,8 +347,8 @@ class ChatContainer extends Component {
       jsonArray.map((v, k) => {
       let message = {};
       message.id = currentId;
-      message.display = ` ${v["airline"]} | Departure: ${v["startdate"]} | Cabin class: ${v["cabin_class"]}  (BOOK NOW)`;
-      message.value = `${v["airline"]} | Departure: ${v["startdate"]} | Cabin class: ${v["cabin_class"]}  (BOOK NOW)`;
+      message.display = ` ${v["airline"]} | Departure: ${v["startdate"]} | Cabin class: ${v["cabin_class"]} `;
+      message.value = `${v["airline"]} | Departure: ${v["startdate"]} | Cabin class: ${v["cabin_class"]} `;
       message.type = "link";
       message.sender = "ndc-server";
       message.link = "https://www.bcdtravel.com/";
