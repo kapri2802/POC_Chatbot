@@ -317,7 +317,7 @@ class ChatContainer extends Component {
         }
       }
     }
-    setTimeout(10000);
+    //setTimeout(10000);
     let messages = this.state.messages;
     let currentId = messages.length;
 
@@ -364,16 +364,16 @@ class ChatContainer extends Component {
     let message = {};
    //let messages = this.state.messages;
           //let currentId = messages.length;
-          message.id = currentId++;
-          message.type = "text";
-          message.sender = "server";
-          message.display = " Your booking has been updated";
+          // message.id = currentId++;
+          // message.type = "text";
+          // message.sender = "server";
+          // message.display = " Your booking has been updated";
       
-          messages.push(message);
+          // messages.push(message);
 
-          setTimeout(() => {
-            this.setState({ loading:false, messages }, () => this.scrolToRef())
-          }, 1000);
+          // setTimeout(() => {
+          //   this.setState({ loading:false, messages }, () => this.scrolToRef())
+          // }, 1000);
   }
 
   scrolToRef() {
