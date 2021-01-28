@@ -50,7 +50,23 @@ exports.listNewFlightBooking = (req, res) => {
         }
       }
     }
+    
+    
+    
+    //ignoring the email address of the user coming from UI as input
+    if( "traveleremailaddress" in filter_criteria){
+      delete filter_criteria["traveleremailaddress"]
+    }
   
+  
+    
+        //ignoring the name of the user coming from UI as input
+    if( "travelerfullname" in filter_criteria){
+      delete filter_criteria["travelerfullname"]
+    }
+  
+    
+    
     // Reading the Excel workbook
     const wb = xlsx.readFile("./NDC_DATA/ndc_data.xls");
   
