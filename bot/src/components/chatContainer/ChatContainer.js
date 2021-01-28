@@ -125,9 +125,6 @@ class ChatContainer extends Component {
       messageBubble.sender = "server";
 
       messages = [...this.state.messages, messageBubble];
-
-      
-      //added delay after button click
       
       setTimeout(() => {
         this.setState(
@@ -138,14 +135,6 @@ class ChatContainer extends Component {
         );
       },1000)
     }
-      
-//       this.setState(
-//         {
-//           messages
-//         },
-//         () => this.scrolToRef()
-//       );
-//     }
 
 //       this.setState(
 //         {
