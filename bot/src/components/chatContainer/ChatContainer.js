@@ -337,7 +337,7 @@ class ChatContainer extends Component {
     msgdetails.id = currentId++;
     msgdetails.type = "text";
     msgdetails.sender = "server";
-    msgdetails.display = " Your modified ticket details are as follows:";
+    msgdetails.display = " Your modified ticket details are as follows. Please click to view details. You might have to pay for fare difference.";
 
     messages.push(msgdetails);
     setTimeout(() => {
@@ -347,8 +347,8 @@ class ChatContainer extends Component {
       jsonArray.map((v, k) => {
       let message = {};
       message.id = currentId;
-      message.display = ` ${v["airline"]} | Departure: ${v["startdate"]} | Cabin class: ${v["cabin_class"]} `;
-      message.value = `${v["airline"]} | Departure: ${v["startdate"]} | Cabin class: ${v["cabin_class"]} `;
+      message.display = ` ${v["airline"]} | Departure: ${v["newstartdate"]} | Cabin class: ${v["newcabinclass"]} `;
+      message.value = `${v["airline"]} | Departure: ${v["newstartdate"]} | Cabin class: ${v["newcabinclass"]} `;
       message.type = "link";
       message.sender = "ndc-server";
       message.link = "https://www.bcdtravel.com/";
