@@ -392,7 +392,7 @@ class ChatContainer extends Component {
       <div >
         <div className="chat-container">
           <header className="chat-container__header">
-            <p className="chat-container__header-title">Welcome to BCD chat!</p>
+            <p className="chat-container__header-title">Welcome to ChatBot!</p>
           </header>
           <div ref={this.messageContainerRef} className="chat-container__chat-list-container" >
             <div  className="chat-container__messages-container">
