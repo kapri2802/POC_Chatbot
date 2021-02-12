@@ -5,6 +5,7 @@ import Amplify from "aws-amplify";
 
 import "../../App.css";
 import BotService from "../../services/botService";
+import NewRequest from "../../services/newRequest"
 import ChatList from "../chatList/ChatList";
 import "./styles.css";
 
@@ -244,25 +245,25 @@ class ChatContainer extends Component {
     }
   }
 
-  async ndcServerResponseHandler(query) {
+  async ndcServerResponseHandler() {
 
     this.setState({loading:true}, () => this.scrolToRef() )
 
     let finalMessage = null;
-    finalMessage = await BotService(
-      query,
-      "http://54.160.101.191:3003/api/NewFlightBooking"
-    );
-
+    finalMessage = await NewRequest("http://api.airtech.zone:8000");
+    console.log("New Booking Request Success")
+    console.log(finalMessage)
     let jsonArray = [];
     if (finalMessage !== null) {
-
-      for (var key in finalMessage) {
-        if (finalMessage.hasOwnProperty(key)) {
-          var val = finalMessage[key];
-          jsonArray.push(val);
+      var resp = finalMessage.AirShoppingRS.DataLists.FlightSegmentList.FlightSegment
+      for (var i in resp) 
+        {
+          var Acode = "Ticket Details are " + resp[i].Departure.AirportCode._ +" to "+ resp[i].Arrival.AirportCode._ +" on "+ resp[i].Departure.Date._ +" "+resp[i].Departure.Time._;
+          console.log("In Loop To traverse NDC Response " + Acode);
+          jsonArray.push(Acode)
         }
-      }
+      console.log(resp)
+      
     }
     let messages = this.state.messages;
     let currentId = messages.length;
@@ -277,10 +278,12 @@ class ChatContainer extends Component {
 
 
     jsonArray.map((v, k) => {
+      console.log("JsonArray from NDC Response")
+      console.log(jsonArray)
       let message = {};
       message.id = currentId;
-      message.display = `${v["airline"]} | Departure: ${v["d_time"]} | Fare: ${v["fare"]} | Duration: ${v["duration"]} (BOOK NOW)`;
-      message.value = `${v["airline"]} | Departure: ${v["d_time"]} | Fare: ${v["fare"]} | Duration: ${v["duration"]}`;
+      message.display = v;
+      message.value = v;
       message.type = "link";
       message.sender = "ndc-server";
       message.link = "https://www.bcdtravel.com/";
@@ -361,7 +364,7 @@ class ChatContainer extends Component {
     setTimeout(() => {
       this.setState({ loading:false, messages }, () => this.scrolToRef())
     }, 5000);
-    let message = {};
+    //let message = {};
    //let messages = this.state.messages;
           //let currentId = messages.length;
           // message.id = currentId++;
