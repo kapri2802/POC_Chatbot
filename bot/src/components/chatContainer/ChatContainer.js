@@ -5,13 +5,12 @@ import Amplify from "aws-amplify";
 
 import "../../App.css";
 import BotService from "../../services/botService";
-import NewRequest from "../../services/newRequest"
 import ChatList from "../chatList/ChatList";
 import "./styles.css";
 
 Amplify.configure({
   Auth: {
-    identityPoolId: "us-east-1:69091c0c-01da-4ad9-8372-02f8635e1934",
+    identityPoolId: "us-east-1:e8ef2317-28a9-40b1-b4c2-0f8a30b71ea9",
     region: "us-east-1",
   },
   Interactions: {
@@ -50,7 +49,6 @@ class ChatContainer extends Component {
         id: 2,
         type: "widget",
         heading: "Please select an option",
-       // setTimeout: setTimeout(5000),
         children: [
           {
             id: 0,
@@ -137,16 +135,6 @@ class ChatContainer extends Component {
       },1000)
     }
 
-//       this.setState(
-//         {
-//           messages
-//         },
-//         () => this.scrolToRef()
-//       );
-//     }
-
-
-
     if (message && message.value) {
 
     this.setState({loading:true}, () => this.scrolToRef() )
@@ -172,21 +160,6 @@ class ChatContainer extends Component {
 
       this.setState({ loading:false, messages }, () => this.scrolToRef());
 
-      // if (message.value === "updateflight") {
-      //   console.log("inside response")
-      //     let messages = this.state.messages; 
-      //     let currentId = messages.length;
-      
-      //     let msg = {};
-      //     msg.id = currentId++;
-      //     msg.type = "text";
-      //     msg.sender = "server";
-      //     msg.display = " 1st line";
-      
-      //     messages.push(msg);
-      // }
-
-
       // When chat completes, these if-else conditions are checked
       if (response.dialogState === "ReadyForFulfillment") {
         if (response.intentName === "BookFlight_New") {
@@ -195,24 +168,7 @@ class ChatContainer extends Component {
           this.ndcServerResponseHandler(query);
 
         } else if (response.intentName === "BookFlight_Update") {
-          // setTimeout(() => {
-          //   this.setState({ loading:false, messages }, () => this.scrolToRef())
-          // }, 5000);
-
-          // let messages = this.state.messages;
-          // let currentId = messages.length;
-      
-          // let msg = {};
-          // msg.id = currentId++;
-          // msg.type = "text";
-          // msg.sender = "server";
-          // msg.display = " Thanks for giving details... updating your Itinerary";
-      
-          // messages.push(msg);
-          // setTimeout(() => {
-          //   this.setState({ loading:false, messages }, () => this.scrolToRef())
-          // }, 5000);
-
+          
           let query = {};
           query.slots = response.slots;
           
@@ -245,12 +201,12 @@ class ChatContainer extends Component {
     }
   }
 
-  async ndcServerResponseHandler() {
+  async ndcServerResponseHandler(query) {
 
     this.setState({loading:true}, () => this.scrolToRef() )
 
     let finalMessage = null;
-    finalMessage = await NewRequest("http://api.airtech.zone:8000");
+    finalMessage = await BotService(query,"https://jigtr7ewjd.execute-api.us-east-1.amazonaws.com/v1");
     console.log("New Booking Request Success")
     console.log(finalMessage)
     let jsonArray = [];
@@ -258,7 +214,7 @@ class ChatContainer extends Component {
       var resp = finalMessage.AirShoppingRS.DataLists.FlightSegmentList.FlightSegment
       for (var i in resp) 
         {
-          var Acode = "Ticket Details are " + resp[i].Departure.AirportCode._ +" to "+ resp[i].Arrival.AirportCode._ +" on "+ resp[i].Departure.Date._ +" "+resp[i].Departure.Time._;
+          var Acode = resp[i].Departure.AirportCode._ +" to "+ resp[i].Arrival.AirportCode._ +" on "+ resp[i].Departure.Date._ +" "+resp[i].Departure.Time._;
           console.log("In Loop To traverse NDC Response " + Acode);
           jsonArray.push(Acode)
         }
@@ -276,6 +232,13 @@ class ChatContainer extends Component {
 
     messages.push(message);
 
+    let msg = {};
+    msg.id = currentId++;
+    msg.type = "text";
+    msg.sender = "server";
+    msg.display = " Ticket Details are as follows : ";
+
+    messages.push(msg);
 
     jsonArray.map((v, k) => {
       console.log("JsonArray from NDC Response")
