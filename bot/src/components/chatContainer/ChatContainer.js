@@ -4,6 +4,8 @@ import Amplify from "aws-amplify";
 
 
 import "../../App.css";
+import rescheduleService from "../../services/rescheduleservice"
+import reschedulenewService from "../../services/reschedulenewService"
 import BotService from "../../services/botService";
 import ChatList from "../chatList/ChatList";
 import "./styles.css";
@@ -59,7 +61,7 @@ class ChatContainer extends Component {
           },
           {
             id: 1,
-            display: "Update Booking",
+            display: "Update Services",
             value: "updateflight",
             type: "button",
             clickedMsg: "I will help you with update booking. I will ask you few questions to gather your existing booking details.",
@@ -74,13 +76,21 @@ class ChatContainer extends Component {
             clickedMsg: "I will help you with cancel booking. I will ask you few questions to gather your existing booking details.",
             handler: this.submitMessage.bind(this),
           },
+          {
+            id: 3,
+            display: "Reschedule",
+            value: "reschedule",
+            type: "button",
+            clickedMsg: "I will help you with reschedule booking. I will ask you few questions to gather your existing booking details.",
+            handler: this.submitMessage.bind(this),
+          },
         ],
       },
     ],
   };
 
   _handleKeyPress = (e) => {
-    
+
     if (e.key === "Enter") {
       let inputMessage = {};
       const inputValue = this.state.input;
@@ -145,7 +155,7 @@ class ChatContainer extends Component {
         message.value
       );
 
-      console.log("aws responses", response);
+      //console.log("aws responses", response);
 
       let responseMessage = {
         display: response.message !== undefined ? response.message : "",
@@ -170,7 +180,7 @@ class ChatContainer extends Component {
 
           let query = {};
           query.slots = response.slots;
-          console.log(query)
+          //console.log(query)
           this.ndcServerUpdateResponseHandler(query);
 
 
@@ -193,11 +203,19 @@ class ChatContainer extends Component {
             this.setState({ loading: false, messages }, () => this.scrolToRef())
           }, 1000);
 
+        } else if (response.intentName === "BookFlight_Reschedule") {
+
+          let query = {};
+          query.slots = response.slots;
+          //console.log(query)
+          this.ndcServerRescheduleResponseHandler(query);
+
         }
       }
     }
   }
 
+//for handling the saving of DIRECT FLIGHT DETAILS to db when a flight is selected using button click from available flights from ndc under newflight booking search button
   buttonHandler = (argu) => {
 
     console.log("inside button handler")
@@ -212,41 +230,39 @@ class ChatContainer extends Component {
     message.sender = "server";
     message.display = "Your have booked following flight";
     messages.push(message);
-    this.setState({ loading: false, messages }, () => this.scrolToRef()) 
+    this.setState({ loading: false, messages }, () => this.scrolToRef())
     this.setState({ loading: true }, () => this.scrolToRef())
 
     const currentdate = Date.now();
+    // API CALL TO SAVE BOOKED FLIGHT TO DB
     axios.post('https://qlxi11ncsg.execute-api.us-east-1.amazonaws.com/v1', {
-        "pnr_ID": currentdate,
-        "dep_city" : argu.value.substr(0,3),
-        "arrival_city" : argu.value.substr(7,3),
-        "date" : argu.value.substr(14,10),
-        "time" : argu.value.substr(25,5),
+      "pnr_ID": currentdate,
+      "dep_city": argu.value.substr(0, 3),
+      "arrival_city": argu.value.substr(7, 3),
+      "sourcecity_departuredate": argu.value.substr(14, 10),
+      "sourcecity_departuretime": argu.value.substr(25, 5),
+      "meal" : "None",
+      "cabinclass" : "None"
     })
       .then((response) => {
-        
-
         messages = this.state.messages
         currentId = messages.length;
         message = {};
         message.id = currentId++;
         message.type = "text";
         message.sender = "server";
-        message.display = "PNR_ID: " + currentdate + " " + argu.value ;
+        message.display = "PNR_ID: " + currentdate + " " + argu.value;
         messages.push(message);
         setTimeout(() => {
           this.setState({ loading: false, messages }, () => this.scrolToRef())
         }, 1000);
       });
-    //LHR to BCN on 2021-03-09 12:00 --- button value
   }
 
+//for handling the saving of IN-DIRECT FLIGHT DETAILS to db when a flight is selected using button click from available flights from ndc under newflight booking search button
   buttonHandlerIndirect = (argu) => {
-
     console.log("inside button handler")
-
     this.setState({ loading: true }, () => this.scrolToRef())
-
     let messages = this.state.messages;
     let currentId = messages.length;
     let message = {};
@@ -255,43 +271,159 @@ class ChatContainer extends Component {
     message.sender = "server";
     message.display = "Your have booked following flight";
     messages.push(message);
-    this.setState({ loading: false, messages }, () => this.scrolToRef()) 
+    this.setState({ loading: false, messages }, () => this.scrolToRef())
     this.setState({ loading: true }, () => this.scrolToRef())
 
+
+    // API CALL TO SAVE BOOKED FLIGHT TO DB
     const currentdate = Date.now();
     axios.post('https://qlxi11ncsg.execute-api.us-east-1.amazonaws.com/v1', {
       "pnr_ID": Date.now(),
-      "dep_city" : argu.value.substr(0,3),
-      "connecting_city" : argu.value.substr(7,3),
-      "sourcecity_departuredate" : argu.value.substr(14,10),
-      "sourcecity_departuretime" : argu.value.substr(25,5),
-      "arrival_city" : argu.value.substr(60,3),
-      "connectingcity_depaturedate" : argu.value.substr(67,10),
-      "connectingcity_depaturetime" : argu.value.substr(78,5),
-      
+      "dep_city": argu.value.substr(0, 3),
+      "connecting_city": argu.value.substr(7, 3),
+      "sourcecity_departuredate": argu.value.substr(14, 10),
+      "sourcecity_departuretime": argu.value.substr(25, 5),
+      "arrival_city": argu.value.substr(60, 3),
+      "connectingcity_depaturedate": argu.value.substr(67, 10),
+      "connectingcity_depaturetime": argu.value.substr(78, 5),
+      "meal" : "None",
+      "cabinclass" : "None"
     })
       .then((response) => {
-        
-
         messages = this.state.messages
         currentId = messages.length;
         message = {};
         message.id = currentId++;
         message.type = "text";
         message.sender = "server";
-        message.display = "PNR_ID: " + currentdate + " " + argu.value ;
+        message.display = "PNR_ID: " + currentdate + " " + argu.value;
         messages.push(message);
         setTimeout(() => {
           this.setState({ loading: false, messages }, () => this.scrolToRef())
         }, 1000);
       });
-    
+
   }
 
-  async ndcServerResponseHandler(query) {
+  // for Reshedule
+  async ndcServerRescheduleResponseHandler(query) {
 
     this.setState({ loading: true }, () => this.scrolToRef())
+    let messages = this.state.messages;
+    let currentId = messages.length;
+    let msg = {};
+    msg.id = currentId++;
+    msg.type = "text";
+    msg.sender = "server";
+    msg.display = "Your previous flight details are as follows :";
+    messages.push(msg);
+    //console.log(msg)
+    let finalMessage = null;
+    finalMessage = await rescheduleService(query);
+    console.log("Previous data for rescheduling")
+    //console.log(finalMessage)
+    var resp = finalMessage.flightdetails
 
+// for displaying the ticket from db under reschedule button after entering PNR_ID
+    let message = {};
+    message.id = currentId;
+    message.display = "Your flight is from " + resp.dep_city + " " + "to " + resp.arrival_city + " " + "on " + " " + resp.sourcecity_departuredate + " " + "having " + " " + resp.cabinclass + " " + "class.";
+    message.type = "text";
+    message.sender = "server";
+    messages.push(message);
+    currentId++;
+    this.setState({ loading: true, messages }, () => this.scrolToRef())
+
+    let reschedulemsg = null;
+    reschedulemsg = await reschedulenewService(query, resp.dep_city, resp.arrival_city);
+    console.log("Previous data for rescheduling",  reschedulemsg , query)
+
+    let jsonArrayreschedule = [];
+    let indirectArray = [];
+    let flag = 0;
+    let flagi = 0;
+    if (reschedulemsg !== null) {
+      var respschedule = reschedulemsg.AirShoppingRS.DataLists.FlightSegmentList.FlightSegment
+      for (var i in respschedule) {
+
+        if ((respschedule[i].Departure.AirportCode._ === resp.dep_city) && (respschedule[i].Arrival.AirportCode._ === resp.arrival_city)) {
+          flag = 1;
+          var directFlight = respschedule[i].Departure.AirportCode._ + " to " + respschedule[i].Arrival.AirportCode._ + " on " + respschedule[i].Departure.Date._ + " " + respschedule[i].Departure.Time._;
+          console.log(directFlight)
+          jsonArrayreschedule.push(directFlight)
+        }
+        if ((respschedule[i].Departure.AirportCode._ !== resp.dep_city) || (respschedule[i].Arrival.AirportCode._ !== resp.arrival_city)) {
+          flagi = 2;
+
+          if (respschedule[i].Departure.AirportCode._ === resp.dep_city) {
+            var indirectFlight = respschedule[i].Departure.AirportCode._ + " to " + respschedule[i].Arrival.AirportCode._ + " on " + respschedule[i].Departure.Date._ + " " + respschedule[i].Departure.Time._ + "\n";
+          }
+          if (respschedule[i].Arrival.AirportCode._ === resp.arrival_city) {
+            var indirectTrip = "\n" + respschedule[i].Departure.AirportCode._ + " to " + respschedule[i].Arrival.AirportCode._ + " on " + respschedule[i].Departure.Date._ + " " + respschedule[i].Departure.Time._;
+            indirectArray.push(indirectFlight + "\t  Connecting via.. \t" + indirectTrip)
+          }
+
+
+        }
+
+      }
+      console.log(resp)
+
+    }
+
+    let msgres = {};
+    msgres.id = currentId++;
+    msgres.type = "text";
+    msgres.sender = "server";
+    msgres.display = " Your available options for new date are as follows : ";
+    messages.push(msgres);
+    console.log("Flag Value " + flag)
+
+
+
+    if (flag === 1) {
+      jsonArrayreschedule.map((v, k) => {
+        console.log("JsonArray from NDC Response")
+        console.log(jsonArrayreschedule)
+        let message = {};
+        message.handler = this.buttonHandler;
+        message.id = currentId;
+        message.display = v;
+        message.value = v;
+        message.type = "button";
+        message.sender = "ndc-server";
+
+        messages.push(message);
+        currentId++;
+
+      });
+    }
+
+    if (flagi === 2) {
+      indirectArray.map((v, k) => {
+        console.log("indirectArray from NDC Response")
+        console.log(indirectArray)
+        console.log(v)
+        let message = {};
+        message.handler = this.buttonHandlerIndirect;
+        message.id = currentId;
+        message.display = v;
+        message.value = v;
+        message.type = "button";
+        message.sender = "ndc-server";
+        messages.push(message);
+        currentId++;
+      });
+    }
+    this.setState({ loading: false, messages }, () => this.scrolToRef())
+
+  }
+
+
+
+
+  async ndcServerResponseHandler(query) {
+    this.setState({ loading: true }, () => this.scrolToRef())
     let finalMessage = null;
     finalMessage = await BotService(query, "https://jigtr7ewjd.execute-api.us-east-1.amazonaws.com/v1");
     console.log("New Booking Request Success")
@@ -389,7 +521,7 @@ class ChatContainer extends Component {
   }
 
 
-  // for update
+  //for update
   async ndcServerUpdateResponseHandler(query) {
 
     this.setState({ loading: true }, () => this.scrolToRef())
@@ -454,8 +586,9 @@ class ChatContainer extends Component {
     setTimeout(() => {
       this.setState({ loading: false, messages }, () => this.scrolToRef())
     }, 5000);
-    
+
   }
+
 
   scrolToRef() {
     const scroll = this.messageContainerRef.current.scrollHeight - this.messageContainerRef.current.clientHeight;
