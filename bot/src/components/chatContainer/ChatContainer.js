@@ -10,7 +10,7 @@ import BotService from "../../services/botService";
 import ChatList from "../chatList/ChatList";
 import "./styles.css";
 const axios = require('axios')
-
+const currentdate = Date.now();
 
 Amplify.configure({
   Auth: {
@@ -181,23 +181,23 @@ class ChatContainer extends Component {
           let query = {};
           query.slots = response.slots;
           //console.log(query)
-          this.ndcServerUpdateResponseHandler(query);
+          //this.ndcServerUpdateResponseHandler(query);
 
 
 
         } else if (response.intentName === "BookFlight_Cancel") {
 
-          let messages = this.state.messages;
-          let currentId = messages.length;
+          // let messages = this.state.messages;
+          // let currentId = messages.length;
 
-          let message = {};
+          // let message = {};
 
-          message.id = currentId++;
-          message.type = "text";
-          message.sender = "server";
-          message.display = " Your booking/service has been cancelled.";
+          // message.id = currentId++;
+          // message.type = "text";
+          // message.sender = "server";
+          // message.display = " Your booking/service has been cancelled.";
 
-          messages.push(message);
+          // messages.push(message);
 
           setTimeout(() => {
             this.setState({ loading: false, messages }, () => this.scrolToRef())
@@ -218,91 +218,116 @@ class ChatContainer extends Component {
 //for handling the saving of DIRECT FLIGHT DETAILS to db when a flight is selected using button click from available flights from ndc under newflight booking search button
   buttonHandler = (argu) => {
 
-    console.log("inside button handler")
-
-    this.setState({ loading: true }, () => this.scrolToRef())
-
+    console.log("inside direct button handler")
     let messages = this.state.messages;
     let currentId = messages.length;
-    let message = {};
-    message.id = currentId++;
-    message.type = "text";
-    message.sender = "server";
-    message.display = "Your have booked following flight";
-    messages.push(message);
-    this.setState({ loading: false, messages }, () => this.scrolToRef())
     this.setState({ loading: true }, () => this.scrolToRef())
 
-    const currentdate = Date.now();
     // API CALL TO SAVE BOOKED FLIGHT TO DB
     axios.post('https://qlxi11ncsg.execute-api.us-east-1.amazonaws.com/v1', {
-      "pnr_ID": currentdate,
-      "dep_city": argu.value.substr(0, 3),
-      "arrival_city": argu.value.substr(7, 3),
-      "sourcecity_departuredate": argu.value.substr(14, 10),
-      "sourcecity_departuretime": argu.value.substr(25, 5),
-      "meal" : "None",
-      "cabinclass" : "None"
-    })
-      .then((response) => {
-        messages = this.state.messages
-        currentId = messages.length;
-        message = {};
+      "type": "search",
+      "pnr_ID": currentdate
+      }).then((response) => {
+      console.log("this is key error",response.data.errorType)
+
+      if (response.data.errorType === "KeyError") 
+      {
+        let message = {};
         message.id = currentId++;
         message.type = "text";
         message.sender = "server";
-        message.display = "PNR_ID: " + currentdate + " " + argu.value;
+        message.display = "Your have booked following flight";
         messages.push(message);
-        setTimeout(() => {
-          this.setState({ loading: false, messages }, () => this.scrolToRef())
-        }, 1000);
-      });
+        
+        axios.post('https://qlxi11ncsg.execute-api.us-east-1.amazonaws.com/v1', {
+        "pnr_ID": currentdate,
+        "dep_city": argu.value.substr(0, 3),
+        "arrival_city": argu.value.substr(7, 3),
+        "sourcecity_departuredate": argu.value.substr(14, 10),
+        "sourcecity_departuretime": argu.value.substr(25, 5),
+        "meal" : "None",
+        "cabinclass" : "None"
+        })
+        .then((response) => {
+          messages = this.state.messages
+          currentId = messages.length;
+          message = {};
+          message.id = currentId++;
+          message.type = "text";
+          message.sender = "server";
+          message.display = "Your pnr id is " + currentdate + ". Your Flight is from " + argu.value;
+          messages.push(message);
+          setTimeout(() => {
+            this.setState({ loading: false, messages }, () => this.scrolToRef())
+          }, 1000);
+        });
+
+      } else if(response.data.flightdetails.pnr_ID === currentdate)
+      {
+          alert("You have already booked ticket")
+          console.log("already booked")
+          this.setState({ loading: false }, () => this.scrolToRef())
+      }
+    });
   }
 
 //for handling the saving of IN-DIRECT FLIGHT DETAILS to db when a flight is selected using button click from available flights from ndc under newflight booking search button
   buttonHandlerIndirect = (argu) => {
-    console.log("inside button handler")
-    this.setState({ loading: true }, () => this.scrolToRef())
+    
+    console.log("inside indirect button handler")
     let messages = this.state.messages;
     let currentId = messages.length;
-    let message = {};
-    message.id = currentId++;
-    message.type = "text";
-    message.sender = "server";
-    message.display = "Your have booked following flight";
-    messages.push(message);
-    this.setState({ loading: false, messages }, () => this.scrolToRef())
     this.setState({ loading: true }, () => this.scrolToRef())
 
-
     // API CALL TO SAVE BOOKED FLIGHT TO DB
-    const currentdate = Date.now();
     axios.post('https://qlxi11ncsg.execute-api.us-east-1.amazonaws.com/v1', {
-      "pnr_ID": Date.now(),
-      "dep_city": argu.value.substr(0, 3),
-      "connecting_city": argu.value.substr(7, 3),
-      "sourcecity_departuredate": argu.value.substr(14, 10),
-      "sourcecity_departuretime": argu.value.substr(25, 5),
-      "arrival_city": argu.value.substr(60, 3),
-      "connectingcity_depaturedate": argu.value.substr(67, 10),
-      "connectingcity_depaturetime": argu.value.substr(78, 5),
-      "meal" : "None",
-      "cabinclass" : "None"
-    })
-      .then((response) => {
-        messages = this.state.messages
-        currentId = messages.length;
-        message = {};
+      "type": "search",
+      "pnr_ID": currentdate
+      }).then((response) => {
+      console.log("this is key error",response.data.errorType)
+
+      if (response.data.errorType === "KeyError") 
+      {
+        let message = {};
         message.id = currentId++;
         message.type = "text";
         message.sender = "server";
-        message.display = "PNR_ID: " + currentdate + " " + argu.value;
+        message.display = "Your have booked following flight";
         messages.push(message);
-        setTimeout(() => {
-          this.setState({ loading: false, messages }, () => this.scrolToRef())
-        }, 1000);
-      });
+        
+        axios.post('https://qlxi11ncsg.execute-api.us-east-1.amazonaws.com/v1', {
+          "pnr_ID": currentdate,
+          "dep_city": argu.value.substr(0, 3),
+          "connecting_city": argu.value.substr(7, 3),
+          "sourcecity_departuredate": argu.value.substr(14, 10),
+          "sourcecity_departuretime": argu.value.substr(25, 5),
+          "arrival_city": argu.value.substr(60, 3),
+          "connectingcity_depaturedate": argu.value.substr(67, 10),
+          "connectingcity_depaturetime": argu.value.substr(78, 5),
+          "meal" : "None",
+          "cabinclass" : "None"
+        })
+        .then((response) => {
+          messages = this.state.messages
+          currentId = messages.length;
+          message = {};
+          message.id = currentId++;
+          message.type = "text";
+          message.sender = "server";
+          message.display = "Your pnr id is " + currentdate + ". Your Flight is from " + argu.value;
+          messages.push(message);
+          setTimeout(() => {
+            this.setState({ loading: false, messages }, () => this.scrolToRef())
+          }, 1000);
+        });
 
+      } else if(response.data.flightdetails.pnr_ID === currentdate)
+      {
+          alert("You have already booked ticket")
+          console.log("already booked")
+          this.setState({ loading: false }, () => this.scrolToRef())
+      }
+    });
   }
 
   // for Reshedule
@@ -522,72 +547,72 @@ class ChatContainer extends Component {
 
 
   //for update
-  async ndcServerUpdateResponseHandler(query) {
+  // async ndcServerUpdateResponseHandler(query) {
 
-    this.setState({ loading: true }, () => this.scrolToRef())
+  //   this.setState({ loading: true }, () => this.scrolToRef())
 
-    let finalMessage = null;
-    finalMessage = await BotService(
-      query,
-      "https://n9lmk5j0dg.execute-api.us-east-1.amazonaws.com/v1"
-    );
+  //   let finalMessage = null;
+  //   finalMessage = await BotService(
+  //     query,
+  //     "https://n9lmk5j0dg.execute-api.us-east-1.amazonaws.com/v1"
+  //   );
 
-    let jsonArray = [];
-    if (finalMessage !== null) {
+  //   let jsonArray = [];
+  //   if (finalMessage !== null) {
 
-      for (var key in finalMessage) {
-        if (finalMessage.hasOwnProperty(key)) {
-          var val = finalMessage[key];
-          jsonArray.push(val);
-        }
-      }
-    }
-    //setTimeout(10000);
-    let messages = this.state.messages;
-    let currentId = messages.length;
+  //     for (var key in finalMessage) {
+  //       if (finalMessage.hasOwnProperty(key)) {
+  //         var val = finalMessage[key];
+  //         jsonArray.push(val);
+  //       }
+  //     }
+  //   }
+  //   //setTimeout(10000);
+  //   let messages = this.state.messages;
+  //   let currentId = messages.length;
 
-    let msg = {};
-    msg.id = currentId++;
-    msg.type = "text";
-    msg.sender = "server";
-    msg.display = " Thanks for giving details... updating your Itinerary";
+  //   let msg = {};
+  //   msg.id = currentId++;
+  //   msg.type = "text";
+  //   msg.sender = "server";
+  //   msg.display = " Thanks for giving details... updating your Itinerary";
 
-    messages.push(msg);
+  //   messages.push(msg);
 
-    setTimeout(() => {
-      this.setState({ loading: false, msg }, () => this.scrolToRef())
-    }, 5000);
+  //   setTimeout(() => {
+  //     this.setState({ loading: false, msg }, () => this.scrolToRef())
+  //   }, 5000);
 
-    let msgdetails = {};
-    msgdetails.id = currentId++;
-    msgdetails.type = "text";
-    msgdetails.sender = "server";
-    msgdetails.display = " Your modified ticket details are as follows. Please click to view details. You might have to pay for fare difference.";
+  //   let msgdetails = {};
+  //   msgdetails.id = currentId++;
+  //   msgdetails.type = "text";
+  //   msgdetails.sender = "server";
+  //   msgdetails.display = " Your modified ticket details are as follows. Please click to view details. You might have to pay for fare difference.";
 
-    messages.push(msgdetails);
-    setTimeout(() => {
-      this.setState({ loading: false, messages }, () => this.scrolToRef())
-    }, 1000);
+  //   messages.push(msgdetails);
+  //   setTimeout(() => {
+  //     this.setState({ loading: false, messages }, () => this.scrolToRef())
+  //   }, 1000);
 
-    jsonArray.map((v, k) => {
-      let message = {};
-      message.id = currentId;
-      message.display = ` ${v["airline"]} | Departure: ${v["newstartdate"]} | Cabin class: ${v["newcabinclass"]} `;
-      message.value = `${v["airline"]} | Departure: ${v["newstartdate"]} | Cabin class: ${v["newcabinclass"]} `;
-      message.type = "link";
-      message.sender = "ndc-server";
-      message.link = "https://www.bcdtravel.com/";
+  //   jsonArray.map((v, k) => {
+  //     let message = {};
+  //     message.id = currentId;
+  //     message.display = ` ${v["airline"]} | Departure: ${v["newstartdate"]} | Cabin class: ${v["newcabinclass"]} `;
+  //     message.value = `${v["airline"]} | Departure: ${v["newstartdate"]} | Cabin class: ${v["newcabinclass"]} `;
+  //     message.type = "link";
+  //     message.sender = "ndc-server";
+  //     message.link = "https://www.bcdtravel.com/";
 
-      messages.push(message);
-      currentId++;
-    });
+  //     messages.push(message);
+  //     currentId++;
+  //   });
 
 
-    setTimeout(() => {
-      this.setState({ loading: false, messages }, () => this.scrolToRef())
-    }, 5000);
+  //   setTimeout(() => {
+  //     this.setState({ loading: false, messages }, () => this.scrolToRef())
+  //   }, 5000);
 
-  }
+  // }
 
 
   scrolToRef() {
