@@ -343,7 +343,16 @@ class ChatContainer extends Component
 // for Reshedule
   async ndcServerRescheduleResponseHandler(query) {
 
+
+    let finalMessage = null;
+    finalMessage = await rescheduleService(query);
+    console.log("Previous data for rescheduling", finalMessage)
+    //console.log(finalMessage)
+  if(finalMessage.errorType !== "KeyError") {
+
     this.setState({ loading: true }, () => this.scrolToRef())
+
+
     let messages = this.state.messages;
     let currentId = messages.length;
     let msg = {};
@@ -353,11 +362,9 @@ class ChatContainer extends Component
     msg.display = "Your previous flight details are as follows :";
     messages.push(msg);
     //console.log(msg)
-    let finalMessage = null;
-    finalMessage = await rescheduleService(query);
-    console.log("Previous data for rescheduling")
-    //console.log(finalMessage)
-    var resp = finalMessage.flightdetails
+    
+    
+      var resp = finalMessage.flightdetails
 
 // for displaying the ticket from db under reschedule button after entering PNR_ID
     let message = {};
@@ -377,6 +384,9 @@ class ChatContainer extends Component
     let indirectArray = [];
     let flag = 0;
     let flagi = 0;
+
+    if (reschedulemsg.AirShoppingRS.DataLists ) {
+      console.log("Reschedule Booking Request Success")
     if (reschedulemsg !== null) {
       var respschedule = reschedulemsg.AirShoppingRS.DataLists.FlightSegmentList.FlightSegment
       for (var i in respschedule) {
@@ -453,6 +463,41 @@ class ChatContainer extends Component
     this.setState({ loading: false, messages }, () => this.scrolToRef())
 
   }
+
+  else {
+    //alert("No flights")
+    
+    console.log("error when no flight is found")
+    console.log(reschedulemsg.AirShoppingRS.Errors.Error[0]['_'])
+    
+    
+    let messages = this.state.messages;
+    let currentId = messages.length;
+    
+    let noflights = {};
+    noflights.id = currentId++;
+    noflights.type = "text";
+    noflights.sender = "server";
+    noflights.display = reschedulemsg.AirShoppingRS.Errors.Error[0]['_'];
+    messages.push(noflights);
+    this.setState({ loading: false, messages }, () => this.scrolToRef())
+    }
+  }
+  else{
+    let messages = this.state.messages;
+    let currentId = messages.length;
+    
+    let nopnr = {};
+    nopnr.id = currentId++;
+    nopnr.type = "text";
+    nopnr.sender = "server";
+    nopnr.display = "Oooooops.. Wrong PNR. Please Click on reschedule again to change the details.";
+    messages.push(nopnr);
+    this.setState({ loading: false, messages }, () => this.scrolToRef())
+
+  }
+
+}
 
 // for New Booking
   async ndcServerResponseHandler(query) {
