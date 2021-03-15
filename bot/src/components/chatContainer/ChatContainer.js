@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { Interactions } from "aws-amplify";
 import Amplify from "aws-amplify";
-
-
 import "../../App.css";
 import rescheduleService from "../../services/rescheduleservice"
 import reschedulenewService from "../../services/reschedulenewService"
@@ -28,7 +26,8 @@ Amplify.configure({
   },
 });
 
-class ChatContainer extends Component {
+class ChatContainer extends Component 
+{
   messageContainerRef = React.createRef();
   state = {
     loading: false,
@@ -264,7 +263,13 @@ class ChatContainer extends Component {
 
       } else if(response.data.flightdetails.pnr_ID === currentdate)
       {
-          alert("You have already booked ticket")
+          let msg = {};
+          msg.id = currentId++;
+          msg.type = "text";
+          msg.sender = "server";
+          msg.display = "You have already booked ticket"
+          msg.push(msg);  
+        //alert("You have already booked ticket")
           console.log("already booked")
           this.setState({ loading: false }, () => this.scrolToRef())
       }
@@ -323,14 +328,19 @@ class ChatContainer extends Component {
 
       } else if(response.data.flightdetails.pnr_ID === currentdate)
       {
-          alert("You have already booked ticket")
+          let message = {};
+          message.id = currentId++;
+          message.type = "text";
+          message.sender = "server";
+          message.display = "You have already booked ticket"
+          messages.push(message);
           console.log("already booked")
           this.setState({ loading: false }, () => this.scrolToRef())
       }
     });
   }
 
-  // for Reshedule
+// for Reshedule
   async ndcServerRescheduleResponseHandler(query) {
 
     this.setState({ loading: true }, () => this.scrolToRef())
@@ -444,16 +454,15 @@ class ChatContainer extends Component {
 
   }
 
-
-
-
+// for New Booking
   async ndcServerResponseHandler(query) {
     this.setState({ loading: true }, () => this.scrolToRef())
     let finalMessage = null;
     finalMessage = await BotService(query, "https://jigtr7ewjd.execute-api.us-east-1.amazonaws.com/v1");
-    console.log("New Booking Request Success")
+    //console.log("New Booking Request Success")
     console.log(finalMessage)
-
+    if (finalMessage.AirShoppingRS.DataLists) {
+      console.log("New Booking Request Success")
 
 
     let jsonArray = [];
@@ -544,6 +553,26 @@ class ChatContainer extends Component {
     }
     this.setState({ loading: false, messages }, () => this.scrolToRef())
   }
+  else {
+    //alert("No flights")
+    
+    console.log("error when no flight is found")
+    console.log(finalMessage.AirShoppingRS.Errors.Error[0]['_'])
+    
+    
+    let messages = this.state.messages;
+    let currentId = messages.length;
+    
+    let noflights = {};
+    noflights.id = currentId++;
+    noflights.type = "text";
+    noflights.sender = "server";
+    noflights.display = finalMessage.AirShoppingRS.Errors.Error[0]['_'];
+    messages.push(noflights);
+    this.setState({ loading: false, messages }, () => this.scrolToRef())
+    }
+}
+
 
 
   //for update
@@ -614,7 +643,6 @@ class ChatContainer extends Component {
 
   // }
 
-
   scrolToRef() {
     const scroll = this.messageContainerRef.current.scrollHeight - this.messageContainerRef.current.clientHeight;
     this.messageContainerRef.current.scrollTo(0, scroll);
@@ -623,8 +651,6 @@ class ChatContainer extends Component {
     console.log(this.messageContainerRef.current.clientHeight);
     console.log(scroll);
   }
-
-
 
   render() {
     return (
@@ -652,6 +678,7 @@ class ChatContainer extends Component {
       </div>
     );
   }
+
 }
 
 export default ChatContainer;
